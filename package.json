@@ -1,6 +1,6 @@
 {
   "name": "autodev",
-  "description": "recursively uncache required files",
+  "description": "quick auto restart script for dev servers",
   "version": "0.0.1",
   "homepage": "https://github.com/paulpflug/",
   "author": {
