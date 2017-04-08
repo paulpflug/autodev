@@ -1,0 +1,47 @@
+{
+  "name": "autodev",
+  "description": "recursively uncache required files",
+  "version": "0.0.0",
+  "homepage": "https://github.com/paulpflug/",
+  "author": {
+    "name": "Paul Pflugradt",
+    "email": "paul.pflugradt@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/paulpflug/autodev"
+  },
+  "bin": {
+    "autodev": "./cli.js"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "main": "autodev.js",
+  "files": [
+    "*.js"
+  ],
+  "dependencies": {
+    "chokidar": "^1.6.1",
+    "commander": "^2.9.0",
+    "recursive-uncache": "^0.0.1"
+  },
+  "devDependencies": {
+    "coffeescript": "^2.0.0-alpha1"
+  },
+  "keywords": [
+    "development",
+    "server",
+    "automatic"
+  ],
+  "readmeFilename": "README.md",
+  "scripts": {
+    "build": "coffee --no-header --compile --output ./ src/*.coffee",
+    "dev": "npm run build && node ./cli.js dev/server.coffee",
+    "test": "",
+    "preversion": "npm run test",
+    "version": "npm run build && git add .",
+    "postversion": "git push && git push --tags && npm publish"
+  }
+}
