@@ -15,6 +15,7 @@ module.exports = (program) =>
   server = null
   close = null
   watcher = null
+  busy = false
   unwatchedModules = []
   for k,v of require.cache
     unwatchedModules.push k
@@ -34,13 +35,17 @@ module.exports = (program) =>
         filesToWatch.push k
     unless watcher?
       watcher = chokidar.watch filesToWatch, ignoreInitial: true
-      .on "all", (e,filepath) => 
+      .on "all", (e,filepath) =>
+        return if busy
         uncache(filepath,__filename)
         restart()
     else
       watcher.add filesToWatch
+    busy = false
   startup(false)
   restart = =>
+    return if busy
+    busy = true
     close?()
     close = null
     if server
