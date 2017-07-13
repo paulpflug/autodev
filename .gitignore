@@ -2,4 +2,4 @@
 .vscode
 npm-debug.log
 node_modules
-*.js
+autodev.js
