@@ -42,9 +42,17 @@ module.exports = (program) =>
     unless watcher?
       watcher = chokidar.watch filesToWatch, ignoreInitial: true
       .on "all", (e,filepath) =>
-        return if busy
-        uncache(filepath,__filename)
-        restart()
+        if busy
+          unless busy == true
+            uncache(filepath,__filename)
+            busy()
+        else
+          uncache(filepath,__filename)
+          busy = resetTimeout = =>
+            clearTimeout(busy.timeoutObj) if busy.timeoutObj?
+            busy.timeoutObj = setTimeout restart, 300
+          busy()
+        
     else
       watcher.add filesToWatch
     busy = false
