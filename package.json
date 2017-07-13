@@ -23,9 +23,9 @@
     "*.js"
   ],
   "dependencies": {
-    "chokidar": "^1.6.1",
-    "commander": "^2.9.0",
-    "recursive-uncache": "^0.0.1"
+    "chokidar": "^1.7.0",
+    "commander": "^2.11.0",
+    "recursive-uncache": "^0.1.0"
   },
   "devDependencies": {
     "coffeescript": "^2.0.0-alpha1"
@@ -37,7 +37,7 @@
   ],
   "readmeFilename": "README.md",
   "scripts": {
-    "build": "coffee --no-header --compile --output ./ src/*.coffee",
+    "build": "coffee --bare --no-header --compile --output ./ src/*.coffee",
     "dev": "npm run build && node ./cli.js dev/server.coffee",
     "test": "",
     "preversion": "npm run test",

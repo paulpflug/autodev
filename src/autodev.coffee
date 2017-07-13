@@ -17,22 +17,28 @@ module.exports = (program) =>
   watcher = null
   busy = false
   unwatchedModules = []
-  for k,v of require.cache
-    unwatchedModules.push k
+
   connections = []
   startup = (isRestart) =>
-    console.log "autodev: " + if isRestart then "restart" else "startup"
+    console.log "\x1b[36mautodev: " + (if isRestart then "starting up again" else "starting up") + "\x1b[0m"
     server = http.createServer()
-    server.on "connection", (con) ->
-      connections.push con
+    server.on "connection", (con) => connections.push con
     try
-      close = require(entry)(server,isRestart)
+      start = await require(entry)
     catch e
-      return console.log e
+      console.error e
     filesToWatch = []
-    for k,v of require.cache
-      if unwatchedModules.indexOf(k) < 0
-        filesToWatch.push k
+    unless isRestart
+      for k,v of require.cache
+        unwatchedModules.push k
+      filesToWatch.push entry
+    if typeof start == "function"
+      try
+        close = await start(server,isRestart)
+      catch e
+        console.error e
+      for k,v of require.cache
+        filesToWatch.push k unless ~unwatchedModules.indexOf(k)
     unless watcher?
       watcher = chokidar.watch filesToWatch, ignoreInitial: true
       .on "all", (e,filepath) =>
@@ -46,14 +52,23 @@ module.exports = (program) =>
   restart = =>
     return if busy
     busy = true
-    close?()
-    close = null
+    console.log "autodev: tearing down\n"
+    promise = new Promise (resolve) =>
+      try
+        await close?()
+      catch e
+        console.error e
+      close = null
+      resolve()
     if server
-      server.once "close", startup.bind(null, true)
+      server.once "close", => 
+        await promise
+        startup(true)
       server.close()
       server = null
       for con in connections
         con?.destroy?()
       connections = []
     else
-      startup(true)
+      await promise
+      return startup(true)

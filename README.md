@@ -13,11 +13,13 @@ npm install --save-dev autodev
 ### Usage
 
 ```js
-//devserver.js
+// devserver.js
+// requires outside won't get watched
 Koa = require("koa") // koa
 express = require("express") // express
 module.exports = (server, isRestart) =>
-
+  // requires inside will get watched
+  yourapp = require("./yourapp")
   // your startup code
   // koa
   app = new Koa()
