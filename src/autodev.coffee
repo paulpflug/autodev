@@ -16,6 +16,11 @@ module.exports = (program) =>
   close = null
   watcher = null
   busy = false
+  unbusyTimeout = null
+  clearUnbusyTimeout = =>
+    if unbusyTimeout?
+      clearTimeout unbusyTimeout
+      unbusyTimeout = null
   unwatchedModules = []
 
   connections = []
@@ -48,7 +53,7 @@ module.exports = (program) =>
             busy()
         else
           uncache(filepath,__filename)
-          busy = resetTimeout = =>
+          busy = =>
             clearTimeout(busy.timeoutObj) if busy.timeoutObj?
             busy.timeoutObj = setTimeout restart, 300
           busy()
@@ -56,10 +61,15 @@ module.exports = (program) =>
     else
       watcher.add filesToWatch
     busy = false
+    clearUnbusyTimeout()
   startup(false)
   restart = =>
-    return if busy
+    return if busy == true
     busy = true
+    clearUnbusyTimeout()
+    unbusyTimeout = setTimeout (=> 
+      console.log "autodev: startup timed out"
+      busy = false), 3000
     console.log "autodev: tearing down\n"
     promise = new Promise (resolve) =>
       try
